@@ -1,9 +1,13 @@
 version: "3.8"
 
 services:
-  mcp-server:
+  model-generator:
     build: .
-    container_name: blender-mcp
+    container_name: model-generator
     ports:
-      - "3000:3000"
-    restart: unless-stopped
+      - "7860:7860"
+    volumes:
+      - ./app/uploads:/app/app/uploads
+      - ./app/models:/app/app/models
+    environment:
+      - MCP_ENDPOINT=http://host.docker.internal:3000
