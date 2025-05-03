@@ -1,13 +1,18 @@
-version: "3.8"
+version: '3.9'
 
 services:
-  model-generator:
+  model_pipeline:
     build: .
-    container_name: model-generator
-    ports:
-      - "7860:7860"
+    container_name: model_pipeline
     volumes:
-      - ./app/uploads:/app/app/uploads
-      - ./app/models:/app/app/models
+      - ./data/input:/workspace/data/input
+      - ./data/output:/workspace/data/output
+      - ./data/tmp:/workspace/data/tmp
+      - ./blender_mcp:/workspace/blender_mcp
+      - ./scripts:/workspace/scripts
+    working_dir: /workspace
+    tty: true
+    stdin_open: true
+    command: ["python", "scripts/run_pipeline.py"]
     environment:
-      - MCP_ENDPOINT=http://host.docker.internal:3000
+      - PYTHONPATH=/workspace
