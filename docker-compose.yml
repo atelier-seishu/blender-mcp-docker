@@ -5,11 +5,11 @@ services:
     build: .
     container_name: model_pipeline
     volumes:
+      - ./scripts:/workspace/scripts
       - ./data/input:/workspace/data/input
       - ./data/output:/workspace/data/output
       - ./data/tmp:/workspace/data/tmp
       - ./blender_mcp:/workspace/blender_mcp
-      - ./scripts:/workspace/scripts
     working_dir: /workspace
     tty: true
     stdin_open: true
