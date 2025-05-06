@@ -10,3 +10,5 @@ einops
 huggingface_hub
 omegaconf
 moderngl
+transformers
+requests

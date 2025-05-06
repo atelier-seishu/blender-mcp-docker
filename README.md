@@ -1,5 +1,41 @@
 # (WIP)blender-mcp-docker
 
+## 
+### ① BlenderをホストOSで起動
+起動確認だけでなく、**BlenderのバージョンがMCPに対応（例: 4.4.1）**していることも確認してください。
+
+### ② BlenderにBlenderMCPアドオンがインストール・有効化されているか確認
+
+アドオン名：BlenderMCP
+
+F4 > Preferences > Add-ons > BlenderMCP にてインストール・チェックボックスON
+
+Blender起動後、自動で port 9876 にてRPC待ち受け状態になる（※設定で有効になっていれば）
+
+📌 もし自動起動されない場合、スクリプトなどでRPC起動する必要あり：
+
+```python
+import blender_mcp.server
+blender_mcp.server.serve(port=9876)
+```
+
+### ③ docker-compose up にてコンテナ起動
+
+TripoSRモデル処理が始まり、メッシュファイルが data/tmp/{stem}_mesh.obj に保存される。
+
+その後 run_mcp.py が blender_rpc.Client('host.docker.internal', 9876) に接続する。
+
+```
+📌 host.docker.internal は Docker for Windows/macOS で ホストのIPを指す名前解決済みホスト名です。
+→ blender_rpc.py 内で socket.create_connection(("host.docker.internal", 9876)) を行うことでホストBlenderに接続可能。
+```
+
+### ④ コンテナ内の run_mcp.py からホストの Blender にRPCで接続
+
+Blender上で実行されるMCPアドオンがメッシュを加工
+
+run_pipeline.py → run_blender_mcp() → run_mcp.py → blender_rpc.Client → Blender
+
 ## 構成
 ```
 project-root/
@@ -16,7 +52,7 @@ project-root/
 │   └── tripo_wrapper.py ← TripoSR実行
 ```
 
-## 実行手順
+## Docker手順
 
 実行手順（手動確認用）
 data/input/ に3面図の正面画像（例：front_view.png）を配置する

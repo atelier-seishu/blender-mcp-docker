@@ -30,7 +30,7 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 RUN pip install git+https://github.com/tatsy/torchmcubes.git
 
 # BlenderMCP を clone（Docker内に含める）
-RUN git clone https://github.com/ahujasid/blender-mcp.git blender_mcp
+RUN git clone https://github.com/ahujasid/blender-mcp.git /workspace/blender_mcp
 
 # TripoSR を clone（Docker内に含める）
 RUN git clone https://github.com/VAST-AI-Research/TripoSR.git tripo_sr
