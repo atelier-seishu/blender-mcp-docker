@@ -12,3 +12,5 @@ omegaconf
 moderngl
 transformers
 requests
+fastapi
+uvicorn

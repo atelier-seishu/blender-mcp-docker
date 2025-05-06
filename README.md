@@ -1,6 +1,45 @@
 # (WIP)blender-mcp-docker
 
-## 
+## 概要
+
+```txt
+┌────────────────────┐
+│ ユーザーが三面図を投入│
+└────────┬────────────┘
+         ▼
+┌───────────────────────────────────────────────┐
+│ Dockerコンテナ (model_pipeline)                                      │
+│ - run_pipeline.py（エントリーポイント）                        │
+│ - tripo_wrapper.py（TripoSR 呼び出し）                     │
+│ - blender_rpc.py（FastAPI 経由で Blender に RPC） │
+│ - TripoSR モデル一式 + BlenderMCP server構築済 │
+└────────┬──────────────────────────────────────┘
+         ▼
+┌──────────────────────────┐
+│ Docker外：ローカルBlender │
+│ - Blender + BlenderMCPアドオン │
+│ - FastAPI on 9876 port       │
+└──────────────────────────┘
+         ▼
+     モデル完成 → data/output に.obj/.fbx等出力
+```
+
+## 使用フロー
+ユーザーが data/input に3面図画像（front, side, back）を配置
+
+docker-compose up で model_pipeline を起動
+
+run_pipeline.py が起動し、画像を TripoSR に渡してメッシュ生成
+
+生成メッシュを FastAPI 経由でローカルの Blender に渡す（POST /process）
+
+Blender内のBlenderMCPアドオンが処理してモデル出力（data/outputへ）
+
+完了通知 or ログ出力で処理確認
+
+
+
+## 利用方法イメージ
 ### ① BlenderをホストOSで起動
 起動確認だけでなく、**BlenderのバージョンがMCPに対応（例: 4.4.1）**していることも確認してください。
 
