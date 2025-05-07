@@ -18,7 +18,6 @@
 ┌──────────────────────────┐
 │ Docker外：ローカルBlender │
 │ - Blender + BlenderMCPアドオン │
-│ - FastAPI on 9876 port       │
 └──────────────────────────┘
          ▼
      モデル完成 → data/output に.obj/.fbx等出力
@@ -31,7 +30,7 @@ docker-compose up で model_pipeline を起動
 
 run_pipeline.py が起動し、画像を TripoSR に渡してメッシュ生成
 
-生成メッシュを FastAPI 経由でローカルの Blender に渡す（POST /process）
+生成メッシュを ソケット通信 経由でローカルの Blender に渡す（POST /process）
 
 Blender内のBlenderMCPアドオンが処理してモデル出力（data/outputへ）
 
