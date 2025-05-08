@@ -1,19 +1,19 @@
 import os
 import shutil
 import logging
+import subprocess
 
 from scripts.tripo_wrapper import run_tripo_sr
 from scripts.blender_rpc import call_blender_mcp
 from scripts.merge_views import merge_three_views
 
-# ディレクトリ構成
 INPUT_DIR = "data/input"
 OUTPUT_DIR = "data/output"
 TMP_DIR = "data/tmp"
 MERGED_IMAGE_PATH = os.path.join(TMP_DIR, "merged_input.jpg")
 MERGED_MESH_PATH = os.path.join(TMP_DIR, "merged_input_mesh.obj")
+LOWPOLY_SCRIPT = "scripts/lowpoly_blender_postprocess.py"
 
-# ログ設定
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 def generate_mesh(input_image_path, output_mesh_path):
@@ -30,18 +30,26 @@ def generate_mesh(input_image_path, output_mesh_path):
     logging.info(f"[INFO] Mesh saved to: {output_mesh_path}")
     return output_mesh_path
 
+def simplify_mesh(obj_path):
+    logging.info(f"[INFO] Simplifying mesh via Blender: {obj_path}")
+    try:
+        subprocess.run([
+            "blender", "--background", "--python", LOWPOLY_SCRIPT, "--", obj_path
+        ], check=True)
+    except subprocess.CalledProcessError as e:
+        logging.error(f"[ERROR] Blender simplification failed: {e}")
+        raise
+
 def process_merged_views():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     os.makedirs(TMP_DIR, exist_ok=True)
 
     try:
-        # 三面図を1枚に統合
         merged_image_path = merge_three_views()
-
-        # 統合画像からメッシュ生成
         merged_mesh_path = generate_mesh(merged_image_path, MERGED_MESH_PATH)
 
-        # Blenderに送信してGLBに変換
+        simplify_mesh(merged_mesh_path)  # ← 追加！
+
         call_blender_mcp({"merged": merged_mesh_path}, OUTPUT_DIR)
 
     except Exception as e:

@@ -23,6 +23,16 @@
      モデル完成 → data/output に.obj/.fbx等出力
 ```
 
+## 確認方法
+Blenderで .glb を確認する方法（Windows）
+
+出力されたファイル：
+```
+\project\blender-mcp-docker\data\output\combined_model.glb
+```
+
+Blenderで File > Import > glTF 2.0 (.glb) を選択し、上記ファイルを開いてください。
+
 ## 使用フロー
 ユーザーが data/input に3面図画像（front, side, back）を配置
 
@@ -30,7 +40,7 @@ docker-compose up で model_pipeline を起動
 
 run_pipeline.py が起動し、画像を TripoSR に渡してメッシュ生成
 
-生成メッシュを ソケット通信 経由でローカルの Blender に渡す（POST /process）
+生成メッシュを FastAPI 経由でローカルの Blender に渡す（POST /process）
 
 Blender内のBlenderMCPアドオンが処理してモデル出力（data/outputへ）
 
@@ -59,25 +69,13 @@ blender_mcp.server.serve(port=9876)
 
 ### ③ docker-compose up にてコンテナ起動
 
-TripoSRモデル処理が始まり、メッシュファイルが data/tmp/{stem}_mesh.obj に保存される。
-
-その後 run_mcp.py が blender_rpc.Client('host.docker.internal', 9876) に接続する。
-
-```
-📌 host.docker.internal は Docker for Windows/macOS で ホストのIPを指す名前解決済みホスト名です。
-→ blender_rpc.py 内で socket.create_connection(("host.docker.internal", 9876)) を行うことでホストBlenderに接続可能。
-```
-
-### ④ コンテナ内の run_mcp.py からホストの Blender にRPCで接続
-
-Blender上で実行されるMCPアドオンがメッシュを加工
-
-run_pipeline.py → run_blender_mcp() → run_mcp.py → blender_rpc.Client → Blender
 
 ## 構成
 ```
 project-root/
 │
+├── blender_addons
+│   └── io_scene_obj   ← BlenderのAddonが不足してた場合の投入用
 ├── docker-compose.yml
 ├── Dockerfile
 ├── requirements.txt
@@ -99,17 +97,6 @@ Dockerコンテナを起動
 
 ```bash
 docker compose up --build
-```
-
-別ターミナルでDocker内に入る
-
-```bash
-docker exec -it model-generator bash
-```
-パイプラインを実行する
-
-```bash
-python scripts/run_pipeline.py
 ```
 
 TripoSR によって data/output/model.obj が生成されます。

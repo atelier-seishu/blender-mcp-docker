@@ -15,7 +15,6 @@ def call_blender_mcp(mesh_paths: dict, output_dir: str):
     host_output_dir = convert_to_host_path(output_dir)
     host_input_dir = convert_to_host_path("data/input")
 
-    # 1つのメッシュのみ処理
     key, path = list(mesh_paths.items())[0]
     host_mesh_path = convert_to_host_path(path)
     base_name = os.path.basename(path).replace("_mesh.obj", "")
@@ -51,6 +50,16 @@ bpy.ops.object.modifier_add(type='REMESH')
 obj.modifiers["Remesh"].mode = 'VOXEL'
 obj.modifiers["Remesh"].voxel_size = 0.01
 bpy.ops.object.modifier_apply(modifier="Remesh")
+
+# Decimate（ローポリ化）
+bpy.ops.object.modifier_add(type='DECIMATE')
+obj.modifiers["Decimate"].ratio = 0.2
+bpy.ops.object.modifier_apply(modifier="Decimate")
+
+# Smoothモディファイア（トゲの軽減）
+bpy.ops.object.modifier_add(type='SMOOTH')
+obj.modifiers["Smooth"].iterations = 5
+bpy.ops.object.modifier_apply(modifier="Smooth")
 
 # Smooth shading
 bpy.ops.object.shade_smooth()

@@ -13,6 +13,6 @@ services:
     working_dir: /workspace
     tty: true
     stdin_open: true
-    command: ["python", "scripts/run_pipeline.py"]
+    command: ["/workspace/scripts/start.sh"]  # 修正ポイント：自動起動スクリプトを実行
     environment:
       - PYTHONPATH=/workspace
